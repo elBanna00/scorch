@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { eachDayOfInterval } from "date-fns";
 import { supabase } from "./supabaseClient";
+import { Database } from "@/types/supabase";
 
 /////////////
 // GET
@@ -34,12 +35,14 @@ export async function getCabin(id: string) {
 //   return data;
 // }
 export interface CabinType {
-  id: number;
-  name: string | null;
-  maxCapacity: number | null;
-  regularPrice: number | null;
+  created_at: string;
+  description: string | null;
   discount: number | null;
+  id: number;
   image: string | null;
+  maxCapacity: number | null;
+  name: string | null;
+  regularPrice: number | null;
 }
 export const getCabins = async function () {
   const { data, error } = await supabase
@@ -103,58 +106,58 @@ export const getCabins = async function () {
 //   return data;
 // }
 
-// export async function getBookedDatesByCabinId(cabinId) {
-//   let today = new Date();
-//   today.setUTCHours(0, 0, 0, 0);
-//   today = today.toISOString();
+export async function getBookedDatesByCabinId(cabinId: string) {
+  let today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  let todayStr = today.toISOString();
 
-//   // Getting all bookings
-//   const { data, error } = await supabase
-//     .from("bookings")
-//     .select("*")
-//     .eq("cabinId", cabinId)
-//     .or(`startDate.gte.${today},status.eq.checked-in`);
+  // Getting all bookings
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("cabinId", cabinId)
+    .or(`startDate.gte.${todayStr},status.eq.checked-in`);
 
-//   if (error) {
-//     console.error(error);
-//     throw new Error("Bookings could not get loaded");
-//   }
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not get loaded");
+  }
 
-//   // Converting to actual dates to be displayed in the date picker
-//   const bookedDates = data
-//     .map((booking) => {
-//       return eachDayOfInterval({
-//         start: new Date(booking.startDate),
-//         end: new Date(booking.endDate),
-//       });
-//     })
-//     .flat();
+  // Converting to actual dates to be displayed in the date picker
+  const bookedDates = data
+    .map((booking) => {
+      return eachDayOfInterval({
+        start: new Date(booking.startDate!),
+        end: new Date(booking.endDate!),
+      });
+    })
+    .flat();
 
-//   return bookedDates;
-// }
+  return bookedDates;
+}
+export type SettingsType = Database["public"]["Tables"]["settings"]["Row"];
+export async function getSettings() {
+  const { data, error } = await supabase.from("settings").select("*").single();
 
-// export async function getSettings() {
-//   const { data, error } = await supabase.from("settings").select("*").single();
+  if (error) {
+    console.error(error);
+    throw new Error("Settings could not be loaded");
+  }
 
-//   if (error) {
-//     console.error(error);
-//     throw new Error("Settings could not be loaded");
-//   }
+  return data;
+}
 
-//   return data;
-// }
-
-// export async function getCountries() {
-//   try {
-//     const res = await fetch(
-//       "https://restcountries.com/v2/all?fields=name,flag"
-//     );
-//     const countries = await res.json();
-//     return countries;
-//   } catch {
-//     throw new Error("Could not fetch countries");
-//   }
-// }
+export async function getCountries() {
+  try {
+    const res = await fetch(
+      "https://restcountries.com/v2/all?fields=name,flag"
+    );
+    const countries = await res.json();
+    return countries;
+  } catch {
+    throw new Error("Could not fetch countries");
+  }
+}
 
 // /////////////
 // // CREATE

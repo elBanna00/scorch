@@ -61,7 +61,18 @@ import Link from "next/link";
 import { UsersIcon } from "@heroicons/react/24/solid";
 import { CabinType } from "../_lib/data-service";
 
-function CabinCard({ cabin }: { cabin: CabinType }) {
+function CabinCard({
+  cabin,
+}: {
+  cabin: {
+    id: number;
+    name: string | null;
+    maxCapacity: number | null;
+    regularPrice: number | null;
+    discount: number | null;
+    image: string | null;
+  };
+}) {
   const { id, name, maxCapacity, regularPrice, discount, image } = cabin;
 
   return (
