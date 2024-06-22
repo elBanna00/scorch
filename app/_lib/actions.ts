@@ -23,8 +23,8 @@ export async function updateGuest(formData: FormData) {
 
   const { data, error } = await supabase
     .from("guests")
-    .update(updateData)
-    .eq("id", session!.user!.guestId);
+    .update(updateData as any)
+    .eq("id", session!.user!.guestId!);
 
   if (error) throw new Error("Guest could not be updated");
 
@@ -51,7 +51,7 @@ export async function createBooking(
     status: "unconfirmed",
   };
 
-  const { error } = await supabase.from("bookings").insert([newBooking]);
+  const { error } = await supabase.from("bookings").insert([newBooking] as any);
 
   if (error) throw new Error("Booking could not be created");
 
@@ -64,7 +64,7 @@ export async function deleteBooking(bookingId: number) {
   const session = await auth();
   if (!session) throw new Error("You must be logged in");
 
-  const guestBookings = await getBookings(session!.user!.guestId);
+  const guestBookings = await getBookings(session!.user!.guestId!);
   const guestBookingIds = guestBookings.map(
     (booking: BookingToInsert) => booking.id
   );
@@ -90,7 +90,7 @@ export async function updateBooking(formData: FormData) {
   if (!session) throw new Error("You must be logged in");
 
   // 2) Authorization
-  const guestBookings = await getBookings(session!.user!.guestId);
+  const guestBookings = await getBookings(session!.user!.guestId!);
   const guestBookingIds = guestBookings.map(
     (booking: BookingToInsert) => booking.id
   );
@@ -107,7 +107,7 @@ export async function updateBooking(formData: FormData) {
   // 4) Mutation
   const { error } = await supabase
     .from("bookings")
-    .update(updateData)
+    .update(updateData as any)
     .eq("id", bookingId)
     .select()
     .single();
