@@ -2,7 +2,23 @@ import NextAuth, { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import { createGuest, getGuest } from "./data-service";
 // import { createGuest, getGuest } from "./data-service";
+declare module "next-auth" {
+  interface Session {
+    user: {
+      guestId: number | undefined | never;
+      image: string | null | undefined;
+      name?: string | null | undefined;
+      email?: string | null | undefined;
+    };
+  }
 
+  interface User {
+    guestId: number | undefined;
+    image?: string | null | undefined;
+    name?: string | null | undefined;
+    email?: string | null | undefined;
+  }
+}
 const authConfig: NextAuthConfig = {
   providers: [
     Google({
